@@ -1,374 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
-
-// ============================================================
-// AUTH STORE — persists to localStorage
-// ============================================================
-const ADMIN_CREDENTIALS = { username: "admin", password: "admin123" };
-
-const getClients = () => {
-  try { return JSON.parse(localStorage.getItem("opencrm_clients") || "[]"); } catch { return []; }
-};
-const saveClients = (clients) => localStorage.setItem("opencrm_clients", JSON.stringify(clients));
-
-const getSession = () => {
-  try { return JSON.parse(sessionStorage.getItem("opencrm_session") || "null"); } catch { return null; }
-};
-const saveSession = (s) => s ? sessionStorage.setItem("opencrm_session", JSON.stringify(s)) : sessionStorage.removeItem("opencrm_session");
-
-// ============================================================
-// LOGIN SCREEN
-// ============================================================
-const LoginScreen = ({ onLogin }) => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [showPass, setShowPass] = useState(false);
-
-  const handleLogin = (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
-    setTimeout(() => {
-      // Check admin
-      if (username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password) {
-        const session = { role: "admin", username: "admin", name: "Admin", id: "admin" };
-        saveSession(session);
-        onLogin(session);
-        return;
-      }
-      // Check clients
-      const clients = getClients();
-      const client = clients.find(c => c.username === username && c.password === password && c.status === "active");
-      if (client) {
-        const session = { role: "client", username: client.username, name: client.name, id: client.id, businessName: client.businessName, modules: client.modules };
-        saveSession(session);
-        onLogin(session);
-        return;
-      }
-      setError("Invalid username or password");
-      setLoading(false);
-    }, 600);
-  };
-
-  return (
-    <div style={{ height: "100vh", background: "var(--bg)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-body)" }}>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Syne:wght@400;600;700;800&display=swap');
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        :root {
-          --bg: #0a0c10; --surface: #111318; --surface2: #181c24; --surface3: #1e2330;
-          --border: #ffffff0f; --border2: #ffffff18; --accent: #4f8ef7; --accent2: #7c6af7;
-          --green: #3ecf8e; --red: #f76f6f; --yellow: #f7c94f; --text: #e8eaf2;
-          --text2: #8a90a8; --text3: #545970; --font-display: 'Syne', sans-serif; --font-body: 'DM Sans', sans-serif;
-        }
-        body { background: var(--bg); color: var(--text); font-family: var(--font-body); }
-        input { background: var(--surface3); border: 1px solid var(--border2); border-radius: 10px; color: var(--text); font-family: var(--font-body); font-size: 14px; padding: 10px 14px; outline: none; transition: border-color .2s; width: 100%; }
-        input:focus { border-color: var(--accent); }
-        button { cursor: pointer; font-family: var(--font-body); font-size: 14px; border: none; border-radius: 10px; transition: all .15s; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes spin { to { transform: rotate(360deg); } }
-      `}</style>
-
-      {/* Background glow */}
-      <div style={{ position: "fixed", top: "30%", left: "50%", transform: "translate(-50%,-50%)", width: 600, height: 600, background: "radial-gradient(circle, #4f8ef722 0%, transparent 70%)", pointerEvents: "none" }}/>
-
-      <div style={{ width: 400, animation: "fadeIn .4s ease" }}>
-        {/* Logo */}
-        <div style={{ textAlign: "center", marginBottom: 36 }}>
-          <div style={{ width: 56, height: 56, background: "linear-gradient(135deg, #4f8ef7, #7c6af7)", borderRadius: 16, display: "inline-flex", alignItems: "center", justifyContent: "center", marginBottom: 16, boxShadow: "0 8px 32px #4f8ef740" }}>
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
-            </svg>
-          </div>
-          <div style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 26, color: "var(--text)", letterSpacing: "-0.5px" }}>OpenCRM</div>
-          <div style={{ color: "var(--text3)", fontSize: 13, marginTop: 4 }}>Sign in to your account</div>
-        </div>
-
-        {/* Card */}
-        <div style={{ background: "var(--surface)", border: "1px solid var(--border2)", borderRadius: 20, padding: 32, boxShadow: "0 24px 64px #0008" }}>
-          <form onSubmit={handleLogin}>
-            <div style={{ marginBottom: 16 }}>
-              <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "var(--text2)", marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.5px" }}>Username</label>
-              <input value={username} onChange={e => setUsername(e.target.value)} placeholder="Enter username" autoFocus required/>
-            </div>
-            <div style={{ marginBottom: 20, position: "relative" }}>
-              <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "var(--text2)", marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.5px" }}>Password</label>
-              <div style={{ position: "relative" }}>
-                <input type={showPass ? "text" : "password"} value={password} onChange={e => setPassword(e.target.value)} placeholder="Enter password" required style={{ paddingRight: 44 }}/>
-                <button type="button" onClick={() => setShowPass(!showPass)} style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", background: "none", padding: 4, color: "var(--text3)" }}>
-                  {showPass ? <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
-                  : <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>}
-                </button>
-              </div>
-            </div>
-            {error && <div style={{ background: "#f76f6f18", border: "1px solid #f76f6f44", borderRadius: 8, padding: "10px 14px", fontSize: 13, color: "#f76f6f", marginBottom: 16, display: "flex", alignItems: "center", gap: 8 }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-              {error}
-            </div>}
-            <button type="submit" disabled={loading} style={{ width: "100%", padding: "12px", background: "linear-gradient(135deg, #4f8ef7, #7c6af7)", color: "#fff", fontWeight: 700, fontSize: 15, borderRadius: 12, boxShadow: "0 4px 16px #4f8ef740", opacity: loading ? 0.7 : 1 }}>
-              {loading ? <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ animation: "spin 1s linear infinite" }}><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
-                Signing in...
-              </span> : "Sign In →"}
-            </button>
-          </form>
-          <div style={{ marginTop: 20, padding: "14px", background: "var(--surface2)", borderRadius: 10, fontSize: 12, color: "var(--text3)" }}>
-            <div style={{ fontWeight: 600, color: "var(--text2)", marginBottom: 4 }}>Demo Admin Login</div>
-            <div>Username: <span style={{ color: "var(--accent)" }}>admin</span> · Password: <span style={{ color: "var(--accent)" }}>admin123</span></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// ============================================================
-// CLIENT ACCESS MANAGEMENT MODULE (admin only)
-// ============================================================
-const AVAILABLE_MODULES = [
-  { id: "dashboard", label: "Dashboard", color: "#4f8ef7" },
-  { id: "crm", label: "CRM", color: "#7c6af7" },
-  { id: "sales", label: "Sales", color: "#3ecf8e" },
-  { id: "invoicing", label: "Invoicing", color: "#f7c94f" },
-  { id: "inventory", label: "Inventory", color: "#f7934f" },
-  { id: "email", label: "Email Marketing", color: "#4f8ef7" },
-  { id: "documents", label: "Documents", color: "#a78bfa" },
-  { id: "database", label: "Database", color: "#34d399" },
-  { id: "accounting", label: "Accounting", color: "#f9a8d4" },
-  { id: "project", label: "Project", color: "#60a5fa" },
-  { id: "sign", label: "Sign", color: "#fbbf24" },
-  { id: "knowledge", label: "Knowledge", color: "#a3e635" },
-  { id: "elearning", label: "eLearning", color: "#f472b6" },
-  { id: "social", label: "Social Marketing", color: "#fb923c" },
-  { id: "whatsapp", label: "WhatsApp", color: "#25d366" },
-];
-
-const ClientsModule = () => {
-  const [clients, setClients] = useState(getClients());
-  const [showModal, setShowModal] = useState(false);
-  const [editing, setEditing] = useState(null);
-  const [form, setForm] = useState({ name: "", businessName: "", email: "", username: "", password: "", modules: ["dashboard", "crm"], status: "active" });
-  const [search, setSearch] = useState("");
-  const [copied, setCopied] = useState(null);
-  const [tab, setTab] = useState("all");
-
-  const save = () => {
-    let updated;
-    if (editing) {
-      updated = clients.map(c => c.id === editing.id ? { ...c, ...form } : c);
-    } else {
-      updated = [...clients, { ...form, id: Date.now().toString(), createdAt: new Date().toISOString().split("T")[0] }];
-    }
-    saveClients(updated);
-    setClients(updated);
-    setShowModal(false);
-    setEditing(null);
-    setForm({ name: "", businessName: "", email: "", username: "", password: "", modules: ["dashboard", "crm"], status: "active" });
-  };
-
-  const deleteClient = (id) => {
-    const updated = clients.filter(c => c.id !== id);
-    saveClients(updated);
-    setClients(updated);
-  };
-
-  const toggleStatus = (id) => {
-    const updated = clients.map(c => c.id === id ? { ...c, status: c.status === "active" ? "suspended" : "active" } : c);
-    saveClients(updated);
-    setClients(updated);
-  };
-
-  const openEdit = (client) => {
-    setEditing(client);
-    setForm({ name: client.name, businessName: client.businessName, email: client.email, username: client.username, password: client.password, modules: client.modules, status: client.status });
-    setShowModal(true);
-  };
-
-  const copyCredentials = (client) => {
-    const text = `OpenCRM Login\nURL: ${window.location.href}\nUsername: ${client.username}\nPassword: ${client.password}`;
-    navigator.clipboard.writeText(text).then(() => { setCopied(client.id); setTimeout(() => setCopied(null), 2000); });
-  };
-
-  const toggleModule = (moduleId) => {
-    setForm(f => ({ ...f, modules: f.modules.includes(moduleId) ? f.modules.filter(m => m !== moduleId) : [...f.modules, moduleId] }));
-  };
-
-  const filtered = clients.filter(c => {
-    const matchSearch = c.name.toLowerCase().includes(search.toLowerCase()) || c.businessName.toLowerCase().includes(search.toLowerCase()) || c.username.toLowerCase().includes(search.toLowerCase());
-    const matchTab = tab === "all" || c.status === tab;
-    return matchSearch && matchTab;
-  });
-
-  const active = clients.filter(c => c.status === "active").length;
-  const suspended = clients.filter(c => c.status === "suspended").length;
-
-  return (
-    <div style={{ padding: 24, animation: "fadeIn .3s ease" }}>
-      {/* Stats */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginBottom: 24 }}>
-        {[
-          { label: "Total Clients", value: clients.length, color: "#4f8ef7", icon: "M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" },
-          { label: "Active", value: active, color: "#3ecf8e", icon: "M22 11.08V12a10 10 0 1 1-5.93-9.14M22 4 12 14.01l-3-3" },
-          { label: "Suspended", value: suspended, color: "#f76f6f", icon: "M10 14l2-2m0 0 2-2m-2 2-2-2m2 2 2 2m7-2a9 9 0 1 1-18 0 9 9 0 0 1 18 0z" },
-        ].map(s => (
-          <div key={s.label} style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 14, padding: "18px 20px", display: "flex", alignItems: "center", gap: 14 }}>
-            <div style={{ width: 44, height: 44, background: `${s.color}18`, borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={s.color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d={s.icon}/></svg>
-            </div>
-            <div>
-              <div style={{ fontSize: 26, fontWeight: 800, color: s.color, fontFamily: "var(--font-display)" }}>{s.value}</div>
-              <div style={{ fontSize: 12, color: "var(--text2)" }}>{s.label}</div>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Toolbar */}
-      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
-        <div style={{ display: "flex", gap: 4, background: "var(--surface2)", borderRadius: 10, padding: 3 }}>
-          {["all", "active", "suspended"].map(t => (
-            <button key={t} onClick={() => setTab(t)} style={{ padding: "6px 14px", borderRadius: 8, fontSize: 13, fontWeight: 600, background: tab === t ? "var(--surface3)" : "transparent", color: tab === t ? "var(--text)" : "var(--text3)", border: tab === t ? "1px solid var(--border2)" : "1px solid transparent" }}>
-              {t.charAt(0).toUpperCase() + t.slice(1)} {t === "all" ? `(${clients.length})` : t === "active" ? `(${active})` : `(${suspended})`}
-            </button>
-          ))}
-        </div>
-        <div style={{ position: "relative", flex: 1 }}>
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" strokeWidth="2" style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)" }}><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search clients..." style={{ paddingLeft: 34 }}/>
-        </div>
-        <button onClick={() => { setEditing(null); setForm({ name: "", businessName: "", email: "", username: "", password: "", modules: ["dashboard", "crm"], status: "active" }); setShowModal(true); }} style={{ padding: "9px 18px", background: "linear-gradient(135deg, #4f8ef7, #7c6af7)", color: "#fff", fontWeight: 700, fontSize: 13, borderRadius: 10, display: "flex", alignItems: "center", gap: 8, whiteSpace: "nowrap" }}>
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          Add Client
-        </button>
-      </div>
-
-      {/* Client Cards */}
-      {filtered.length === 0 ? (
-        <div style={{ textAlign: "center", padding: "60px 0", color: "var(--text3)" }}>
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ marginBottom: 12, opacity: 0.4 }}><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-          <div style={{ fontSize: 15 }}>{clients.length === 0 ? "No clients yet. Add your first client!" : "No clients match your search."}</div>
-        </div>
-      ) : (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))", gap: 16 }}>
-          {filtered.map(client => (
-            <div key={client.id} style={{ background: "var(--surface)", border: `1px solid ${client.status === "active" ? "var(--border2)" : "#f76f6f33"}`, borderRadius: 16, padding: 20, transition: "box-shadow .2s" }}>
-              <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 14 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                  <div style={{ width: 44, height: 44, background: "linear-gradient(135deg, #4f8ef7, #7c6af7)", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-display)", fontWeight: 800, color: "#fff", fontSize: 16 }}>
-                    {client.name.charAt(0).toUpperCase()}
-                  </div>
-                  <div>
-                    <div style={{ fontWeight: 700, color: "var(--text)", fontSize: 14 }}>{client.name}</div>
-                    <div style={{ fontSize: 12, color: "var(--text3)" }}>{client.businessName}</div>
-                  </div>
-                </div>
-                <span style={{ padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, background: client.status === "active" ? "#3ecf8e22" : "#f76f6f22", color: client.status === "active" ? "#3ecf8e" : "#f76f6f", border: `1px solid ${client.status === "active" ? "#3ecf8e44" : "#f76f6f44"}` }}>
-                  {client.status === "active" ? "● Active" : "● Suspended"}
-                </span>
-              </div>
-
-              <div style={{ fontSize: 12, color: "var(--text3)", marginBottom: 12 }}>
-                <div style={{ marginBottom: 4 }}>📧 {client.email}</div>
-                <div>🔑 @{client.username} · Added {client.createdAt}</div>
-              </div>
-
-              {/* Module badges */}
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginBottom: 14 }}>
-                {client.modules.slice(0, 6).map(mId => {
-                  const mod = AVAILABLE_MODULES.find(m => m.id === mId);
-                  return mod ? <span key={mId} style={{ padding: "2px 8px", borderRadius: 6, fontSize: 10, fontWeight: 600, background: `${mod.color}18`, color: mod.color, border: `1px solid ${mod.color}33` }}>{mod.label}</span> : null;
-                })}
-                {client.modules.length > 6 && <span style={{ padding: "2px 8px", borderRadius: 6, fontSize: 10, fontWeight: 600, background: "var(--surface3)", color: "var(--text3)" }}>+{client.modules.length - 6} more</span>}
-              </div>
-
-              {/* Actions */}
-              <div style={{ display: "flex", gap: 8 }}>
-                <button onClick={() => copyCredentials(client)} title="Copy login credentials" style={{ flex: 1, padding: "7px", background: copied === client.id ? "#3ecf8e22" : "var(--surface2)", border: `1px solid ${copied === client.id ? "#3ecf8e44" : "var(--border2)"}`, borderRadius: 8, fontSize: 12, color: copied === client.id ? "#3ecf8e" : "var(--text2)", display: "flex", alignItems: "center", justifyContent: "center", gap: 5 }}>
-                  {copied === client.id ? <><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg> Copied!</> : <><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy Login</>}
-                </button>
-                <button onClick={() => openEdit(client)} title="Edit" style={{ padding: "7px 12px", background: "var(--surface2)", border: "1px solid var(--border2)", borderRadius: 8, color: "var(--text2)" }}>
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                </button>
-                <button onClick={() => toggleStatus(client.id)} title={client.status === "active" ? "Suspend" : "Activate"} style={{ padding: "7px 12px", background: client.status === "active" ? "#f7c94f18" : "#3ecf8e18", border: `1px solid ${client.status === "active" ? "#f7c94f33" : "#3ecf8e33"}`, borderRadius: 8, color: client.status === "active" ? "#f7c94f" : "#3ecf8e" }}>
-                  {client.status === "active" ? <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg> : <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>}
-                </button>
-                <button onClick={() => { if (window.confirm(`Delete ${client.name}?`)) deleteClient(client.id); }} title="Delete" style={{ padding: "7px 12px", background: "#f76f6f18", border: "1px solid #f76f6f33", borderRadius: 8, color: "#f76f6f" }}>
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Add/Edit Modal */}
-      {showModal && (
-        <div style={{ position: "fixed", inset: 0, background: "#000a", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", animation: "fadeIn .2s ease" }} onClick={e => e.target === e.currentTarget && setShowModal(false)}>
-          <div style={{ background: "var(--surface)", border: "1px solid var(--border2)", borderRadius: 20, padding: 28, width: 560, maxHeight: "90vh", overflowY: "auto", boxShadow: "0 24px 64px #000a" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
-              <div style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 18 }}>{editing ? "Edit Client" : "Add New Client"}</div>
-              <button onClick={() => setShowModal(false)} style={{ background: "var(--surface2)", color: "var(--text2)", padding: "6px 10px", borderRadius: 8 }}>✕</button>
-            </div>
-
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 14 }}>
-              <div>
-                <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: "var(--text2)", marginBottom: 5, textTransform: "uppercase" }}>Full Name *</label>
-                <input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder="John Smith"/>
-              </div>
-              <div>
-                <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: "var(--text2)", marginBottom: 5, textTransform: "uppercase" }}>Business Name *</label>
-                <input value={form.businessName} onChange={e => setForm(f => ({ ...f, businessName: e.target.value }))} placeholder="Acme Corp"/>
-              </div>
-              <div>
-                <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: "var(--text2)", marginBottom: 5, textTransform: "uppercase" }}>Email</label>
-                <input type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} placeholder="john@acme.com"/>
-              </div>
-              <div>
-                <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: "var(--text2)", marginBottom: 5, textTransform: "uppercase" }}>Status</label>
-                <select value={form.status} onChange={e => setForm(f => ({ ...f, status: e.target.value }))} style={{ width: "100%", padding: "8px 12px" }}>
-                  <option value="active">Active</option>
-                  <option value="suspended">Suspended</option>
-                </select>
-              </div>
-              <div>
-                <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: "var(--text2)", marginBottom: 5, textTransform: "uppercase" }}>Username *</label>
-                <input value={form.username} onChange={e => setForm(f => ({ ...f, username: e.target.value.toLowerCase().replace(/\s/g, "") }))} placeholder="johnsmith"/>
-              </div>
-              <div>
-                <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: "var(--text2)", marginBottom: 5, textTransform: "uppercase" }}>Password *</label>
-                <input type="text" value={form.password} onChange={e => setForm(f => ({ ...f, password: e.target.value }))} placeholder="Set a password"/>
-              </div>
-            </div>
-
-            {/* Module selector */}
-            <div style={{ marginBottom: 24 }}>
-              <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: "var(--text2)", marginBottom: 10, textTransform: "uppercase" }}>Allowed Modules ({form.modules.length} selected)</label>
-              <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-                {AVAILABLE_MODULES.map(m => (
-                  <button key={m.id} onClick={() => toggleModule(m.id)} style={{ padding: "5px 12px", borderRadius: 8, fontSize: 12, fontWeight: 600, background: form.modules.includes(m.id) ? `${m.color}22` : "var(--surface2)", color: form.modules.includes(m.id) ? m.color : "var(--text3)", border: `1px solid ${form.modules.includes(m.id) ? m.color + "55" : "var(--border)"}`, transition: "all .15s" }}>
-                    {form.modules.includes(m.id) && "✓ "}{m.label}
-                  </button>
-                ))}
-              </div>
-              <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
-                <button onClick={() => setForm(f => ({ ...f, modules: AVAILABLE_MODULES.map(m => m.id) }))} style={{ fontSize: 11, color: "var(--accent)", background: "none", padding: "2px 6px" }}>Select All</button>
-                <button onClick={() => setForm(f => ({ ...f, modules: [] }))} style={{ fontSize: 11, color: "var(--text3)", background: "none", padding: "2px 6px" }}>Clear All</button>
-              </div>
-            </div>
-
-            <div style={{ display: "flex", gap: 10 }}>
-              <button onClick={() => setShowModal(false)} style={{ flex: 1, padding: "11px", background: "var(--surface2)", color: "var(--text2)", border: "1px solid var(--border2)", borderRadius: 10 }}>Cancel</button>
-              <button onClick={save} disabled={!form.name || !form.username || !form.password} style={{ flex: 2, padding: "11px", background: "linear-gradient(135deg, #4f8ef7, #7c6af7)", color: "#fff", fontWeight: 700, borderRadius: 10, opacity: (!form.name || !form.username || !form.password) ? 0.5 : 1 }}>
-                {editing ? "Save Changes" : "Create Client Account"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-};
+import { useState, useEffect, useRef } from "react";
 
 // ============================================================
 // GLOBAL STYLES
@@ -688,8 +318,8 @@ const useStore = () => {
 // ============================================================
 // LAYOUT COMPONENTS
 // ============================================================
-const Sidebar = ({ active, setActive, collapsed, setCollapsed, session, onLogout, allowedModules }) => {
-  const allModules = [
+const Sidebar = ({ active, setActive, collapsed, setCollapsed }) => {
+  const modules = [
     { id: "dashboard", label: "Dashboard", icon: "dashboard", color: "#4f8ef7" },
     { id: "crm", label: "CRM", icon: "crm", color: "#7c6af7" },
     { id: "sales", label: "Sales", icon: "sales", color: "#3ecf8e" },
@@ -706,11 +336,6 @@ const Sidebar = ({ active, setActive, collapsed, setCollapsed, session, onLogout
     { id: "social", label: "Social Marketing", icon: "social", color: "#fb923c" },
     { id: "whatsapp", label: "WhatsApp", icon: "whatsapp", color: "#25d366" },
   ];
-
-  // Admin gets all modules + Clients management
-  const modules = session?.role === "admin"
-    ? [...allModules, { id: "clients", label: "Client Access", icon: "crm", color: "#f7934f" }]
-    : allModules.filter(m => allowedModules?.includes(m.id));
 
   return (
     <div style={{
@@ -730,39 +355,9 @@ const Sidebar = ({ active, setActive, collapsed, setCollapsed, session, onLogout
         {!collapsed && <span style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 17, color: "var(--text)", whiteSpace: "nowrap" }}>OpenCRM</span>}
       </div>
 
-      {/* Client badge */}
-      {!collapsed && session?.role === "client" && (
-        <div style={{ margin: "8px 12px 0", padding: "8px 10px", background: "#4f8ef712", border: "1px solid #4f8ef733", borderRadius: 8 }}>
-          <div style={{ fontSize: 10, fontWeight: 700, color: "#4f8ef7", textTransform: "uppercase", letterSpacing: "0.5px" }}>Business</div>
-          <div style={{ fontSize: 12, color: "var(--text)", fontWeight: 600, marginTop: 1 }}>{session.businessName}</div>
-        </div>
-      )}
-
       {/* Nav */}
       <div style={{ flex: 1, overflowY: "auto", overflowX: "hidden", padding: "8px 0" }}>
-        {/* Separator before Clients for admin */}
-        {session?.role === "admin" && modules.map((m, i) => (
-          <div key={m.id}>
-            {m.id === "clients" && <div style={{ height: 1, background: "var(--border)", margin: "8px 0" }}/>}
-            <button onClick={() => setActive(m.id)} title={collapsed ? m.label : ""} style={{
-              width: "100%", display: "flex", alignItems: "center", gap: 10,
-              padding: collapsed ? "10px 0" : "9px 14px",
-              justifyContent: collapsed ? "center" : "flex-start",
-              background: active === m.id ? `${m.color}18` : "transparent",
-              color: active === m.id ? m.color : "var(--text2)",
-              borderRadius: 0, fontWeight: active === m.id ? 600 : 400,
-              fontSize: 13, whiteSpace: "nowrap",
-              borderLeft: active === m.id ? `3px solid ${m.color}` : "3px solid transparent",
-              transition: "all .15s",
-            }}>
-              <Icon name={m.icon} size={17} color={active === m.id ? m.color : "var(--text3)"}/>
-              {!collapsed && <span>{m.label}</span>}
-              {!collapsed && m.id === "clients" && <span style={{ marginLeft: "auto", fontSize: 10, fontWeight: 700, background: "#f7934f22", color: "#f7934f", border: "1px solid #f7934f44", borderRadius: 6, padding: "1px 6px" }}>ADMIN</span>}
-            </button>
-          </div>
-        ))}
-
-        {session?.role !== "admin" && modules.map(m => (
+        {modules.map(m => (
           <button key={m.id} onClick={() => setActive(m.id)} title={collapsed ? m.label : ""} style={{
             width: "100%", display: "flex", alignItems: "center", gap: 10,
             padding: collapsed ? "10px 0" : "9px 14px",
@@ -780,22 +375,6 @@ const Sidebar = ({ active, setActive, collapsed, setCollapsed, session, onLogout
         ))}
       </div>
 
-      {/* User + logout */}
-      {!collapsed && (
-        <div style={{ padding: "12px 14px", borderTop: "1px solid var(--border)", display: "flex", alignItems: "center", gap: 10 }}>
-          <div style={{ width: 30, height: 30, background: "linear-gradient(135deg, #4f8ef7, #7c6af7)", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 12, color: "#fff", flexShrink: 0 }}>
-            {session?.name?.charAt(0).toUpperCase()}
-          </div>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 12, fontWeight: 600, color: "var(--text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{session?.name}</div>
-            <div style={{ fontSize: 10, color: session?.role === "admin" ? "#f7934f" : "#4f8ef7", fontWeight: 700, textTransform: "uppercase" }}>{session?.role}</div>
-          </div>
-          <button onClick={onLogout} title="Sign out" style={{ background: "none", color: "var(--text3)", padding: 4 }}>
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-          </button>
-        </div>
-      )}
-
       {/* Collapse toggle */}
       <button onClick={() => setCollapsed(!collapsed)} style={{
         padding: "14px", background: "transparent", color: "var(--text3)",
@@ -807,8 +386,8 @@ const Sidebar = ({ active, setActive, collapsed, setCollapsed, session, onLogout
   );
 };
 
-const Topbar = ({ module, session, onLogout }) => {
-  const labels = { dashboard: "Dashboard", crm: "CRM", sales: "Sales", invoicing: "Invoicing", inventory: "Inventory", email: "Email Marketing", documents: "Documents", database: "Database", accounting: "Accounting", project: "Project", sign: "Sign", knowledge: "Knowledge Base", elearning: "eLearning", social: "Social Marketing", whatsapp: "WhatsApp Messaging", clients: "Client Access Management" };
+const Topbar = ({ module }) => {
+  const labels = { dashboard: "Dashboard", crm: "CRM", sales: "Sales", invoicing: "Invoicing", inventory: "Inventory", email: "Email Marketing", documents: "Documents", database: "Database", accounting: "Accounting", project: "Project", sign: "Sign", knowledge: "Knowledge Base", elearning: "eLearning", social: "Social Marketing", whatsapp: "WhatsApp Messaging" };
   return (
     <div style={{ height: 56, background: "var(--surface)", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", padding: "0 24px", gap: 16, flexShrink: 0 }}>
       <div style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 16, color: "var(--text)" }}>{labels[module] || module}</div>
@@ -1767,28 +1346,11 @@ const WhatsAppModule = ({ data }) => {
 // MAIN APP
 // ============================================================
 export default function App() {
-  const [session, setSession] = useState(() => getSession());
   const [active, setActive] = useState("dashboard");
   const [collapsed, setCollapsed] = useState(false);
   const { data, update } = useStore();
 
-  const handleLogin = (s) => {
-    setSession(s);
-    setActive(s.role === "admin" ? "dashboard" : (s.modules?.[0] || "dashboard"));
-  };
-
-  const handleLogout = () => {
-    saveSession(null);
-    setSession(null);
-    setActive("dashboard");
-  };
-
-  if (!session) return <><GlobalStyle/><LoginScreen onLogin={handleLogin}/></>;
-
-  // Filter modules for clients
-  const allowedModules = session.role === "admin" ? null : session.modules;
-
-  const allModuleMap = {
+  const moduleMap = {
     dashboard: <Dashboard data={data}/>,
     crm: <CRMModule data={data} update={update}/>,
     sales: <SalesModule data={data}/>,
@@ -1804,31 +1366,17 @@ export default function App() {
     elearning: <ELearningModule data={data}/>,
     social: <SocialModule data={data}/>,
     whatsapp: <WhatsAppModule data={data}/>,
-    ...(session.role === "admin" ? { clients: <ClientsModule/> } : {}),
   };
-
-  // Ensure active module is accessible
-  const effectiveActive = (allowedModules && !allowedModules.includes(active) && active !== "clients")
-    ? (allowedModules[0] || "dashboard")
-    : active;
 
   return (
     <>
       <GlobalStyle/>
       <div style={{ display: "flex", height: "100vh", overflow: "hidden" }}>
-        <Sidebar
-          active={effectiveActive}
-          setActive={setActive}
-          collapsed={collapsed}
-          setCollapsed={setCollapsed}
-          session={session}
-          onLogout={handleLogout}
-          allowedModules={allowedModules}
-        />
+        <Sidebar active={active} setActive={setActive} collapsed={collapsed} setCollapsed={setCollapsed}/>
         <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
-          <Topbar module={effectiveActive} session={session} onLogout={handleLogout}/>
+          <Topbar module={active}/>
           <div style={{ flex: 1, overflowY: "auto" }}>
-            {allModuleMap[effectiveActive] || <div style={{ padding: 24 }}>Module not found</div>}
+            {moduleMap[active] || <div style={{ padding: 24 }}>Module not found</div>}
           </div>
         </div>
       </div>
