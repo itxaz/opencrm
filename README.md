@@ -77,6 +77,14 @@ opencrm/
 
 ---
 
+## 🏛️ Architecture
+
+See **[`docs/inspire-crm-architecture.md`](docs/inspire-crm-architecture.md)** for the Inspire CRM
+technical blueprint — database schema, five-phase roadmap with base/premium tiers, data-flow
+diagrams, and the scalability plan (custom Node + Postgres, shared DB with row-level security).
+
+---
+
 ## 🔮 Next Steps (Adding a Real Backend)
 
 To persist data across sessions, add:
