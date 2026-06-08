@@ -122,22 +122,26 @@ flowchart TB
 
 ### Deployment topology
 
-The two halves of the system deploy to different kinds of platform — this is deliberate, and the
-reason "host it on Netlify/Vercel" only applies to the frontend.
+All four pieces deploy to **one platform — Railway** — as a single project: the API container, the
+static SPA, managed Postgres, and managed Redis. This consolidates hosting/billing while keeping the
+API a **persistent container** (not serverless). Config-as-code lives in `server/railway.json`,
+`server/Dockerfile`, `Dockerfile.web`, and `Caddyfile`; see
+[DEPLOY-RAILWAY.md](DEPLOY-RAILWAY.md).
 
-| Layer | Host | Why |
+| Layer | Railway service | Why |
 |---|---|---|
-| **Frontend SPA** | **Netlify** (static + global CDN); config in `netlify.toml` | Pure static Vite build. CDN delivery, instant rollbacks, SPA fallback + asset caching. Vercel works identically; Netlify chosen here. |
-| **API + workers** | **Container host** (Railway / Render / Fly.io), horizontally scaled | Persistent process: pooled DB connections, RLS transactions, and long-running/bursty batch jobs (parsing, statement runs, Phase 5 portal bots) that do **not** fit serverless function time limits. |
-| **Database** | **Managed Postgres** (Neon / RDS / Crunchy) + PgBouncer | Bounded, pooled connections; read replicas + partitioning as tenants scale to national volume (see §9). |
-| **Queue / cache** | **Managed Redis** (e.g. Upstash) | BullMQ job queue + hot-path cache. |
+| **Frontend SPA** | **web** — `Dockerfile.web` (Caddy serves the Vite build) | Static assets with SPA fallback + immutable asset caching. Reaches the API via build-time `VITE_API_URL`. |
+| **API + workers** | **api** — `server/Dockerfile`, scaled horizontally | Persistent process: pooled DB connections, RLS transactions, and long-running/bursty batch jobs (parsing, statement runs, Phase 5 portal bots) that do **not** fit serverless time limits. Workers run as extra services off the same image. |
+| **Database** | **Postgres** (managed) + PgBouncer/pooling | Bounded, pooled connections; read replicas + partitioning as tenants scale to national volume (see §9). |
+| **Queue / cache** | **Redis** (managed) | BullMQ job queue + hot-path cache. |
 
-> **Why not fully-serverless (Netlify/Vercel Functions)?** A commission engine needs persistent
-> pooled DB access and heavy batch/worker workloads. On serverless you hit connection storms (each
-> function instance opens DB connections), function execution-time limits on parse/statement jobs,
-> and cold-start latency on the hot path — and you'd end up running a container for the workers
-> anyway. The SPA stays on Netlify; the API runs as a container. The SPA reaches the API via
-> `VITE_API_URL` (CORS-enabled) or a Netlify `/api/*` proxy redirect.
+> **Why one platform but still a container (not serverless)?** A commission engine needs persistent
+> pooled DB access and heavy batch/worker workloads. Fully-serverless (Netlify/Vercel Functions)
+> hits connection storms, function execution-time limits on parse/statement jobs, and cold-start
+> latency on the hot path — and you'd run a container for the workers anyway. Railway gives the SPA,
+> the container API, Postgres, and Redis from one project. The exact same code/images run on
+> Render / Fly.io / AWS if you ever migrate — only the dashboard wiring differs. (Netlify remains a
+> drop-in alternative for the SPA alone via `netlify.toml`.)
 
 ---
 

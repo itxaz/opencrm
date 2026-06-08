@@ -1,0 +1,14 @@
+# Inspire CRM frontend — static SPA served by Caddy. For Railway "web" service.
+FROM node:20-slim AS build
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+# Baked in at build time so the SPA knows where the API lives.
+ARG VITE_API_URL=""
+ENV VITE_API_URL=$VITE_API_URL
+RUN npm run build
+
+FROM caddy:2-alpine
+COPY Caddyfile /etc/caddy/Caddyfile
+COPY --from=build /app/dist /srv

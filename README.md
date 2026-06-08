@@ -5,31 +5,30 @@ A full-featured open-source CRM built with React. Includes 15 modules:
 
 ---
 
-## ⚡ Deploy the frontend to Netlify in 3 Steps
+## ⚡ Deploy everything on Railway (one platform)
 
-### Option A — Git-based (Easiest)
-1. Push this repo to GitHub (see below)
-2. Go to [netlify.com](https://netlify.com) → **Add new site → Import an existing project**
-3. Pick the repo → Netlify reads `netlify.toml` (build `npm run build`, publish `dist`) → **Deploy**
+A single Railway project hosts all four pieces — the **API container**, the **static SPA**, managed
+**Postgres**, and managed **Redis**. Full walkthrough: **[`docs/DEPLOY-RAILWAY.md`](docs/DEPLOY-RAILWAY.md)**.
 
-`netlify.toml` already configures the SPA fallback and asset caching. Done! 🎉
-
----
-
-### Option B — Netlify CLI
 ```bash
-npm install -g netlify-cli
-cd opencrm
-npm install
-netlify deploy --build --prod
+npm i -g @railway/cli
+railway login
+railway init
+railway add --database postgres
+railway add --database redis
+# then create two services from this repo:
+#   api → Root Directory "server"  (uses server/railway.json + server/Dockerfile)
+#   web → Dockerfile path "Dockerfile.web", build var VITE_API_URL = api's public URL
 ```
 
-> **Note — this deploys the frontend only.** The Inspire CRM API (`server/`) is a long-lived
-> Node + Postgres service and is **not** hosted on Netlify (nor Vercel) — both are serverless/static
-> platforms. Run the API on a container host (Railway / Render / Fly.io) with managed Postgres +
-> Redis, and point the SPA at it via `VITE_API_URL` (CORS is enabled) or the `/api/*` proxy redirect
-> in `netlify.toml`. See [`docs/inspire-crm-architecture.md`](docs/inspire-crm-architecture.md) for
-> the deployment topology and rationale.
+The API runs as a **persistent container** (not serverless) — required for pooled DB connections,
+RLS transactions, and the parsing/statement/portal background workers. The same images run
+unchanged on Render / Fly.io / AWS.
+
+> **Frontend-only alternative:** the SPA can also deploy to **Netlify** (or Vercel) on its own via
+> the included `netlify.toml` (SPA fallback + asset caching); point it at the API with `VITE_API_URL`.
+> See [`docs/inspire-crm-architecture.md`](docs/inspire-crm-architecture.md) for the deployment
+> topology and rationale.
 
 ---
 
