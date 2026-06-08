@@ -55,4 +55,21 @@ export async function carrierRoutes(app: FastifyInstance): Promise<void> {
       return reply.code(201).send(rows[0]);
     });
   });
+
+  app.patch('/appointments/:id', { preHandler: requireRole('agency_admin', 'agency_staff') }, async (req, reply) => {
+    const params = parse(z.object({ id: z.string().uuid() }), req.params, reply);
+    const body = parse(z.object({ active: z.boolean(), carrierCode: z.string().optional() }), req.body, reply);
+    if (!params || !body) return;
+    return withTenant(tenantContext(req), async (c) => {
+      const { rows, rowCount } = await c.query(
+        `UPDATE agency_carrier_appointments
+         SET active = $2, carrier_code = COALESCE($3, carrier_code)
+         WHERE id = $1
+         RETURNING id, carrier_id, carrier_code, active`,
+        [params.id, body.active, body.carrierCode ?? null],
+      );
+      if (!rowCount) return reply.code(404).send({ error: 'appointment_not_found' });
+      return rows[0];
+    });
+  });
 }

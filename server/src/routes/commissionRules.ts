@@ -20,9 +20,12 @@ export async function commissionRuleRoutes(app: FastifyInstance): Promise<void> 
   app.get('/commission-rules', async (req) =>
     withTenant(tenantContext(req), async (c) => {
       const { rows } = await c.query(
-        `SELECT id, carrier_id, product_line, basis, first_term_pct, renewal_pct,
-                agency_retains_renewal, effective_from, effective_to
-         FROM commission_rules ORDER BY carrier_id, product_line`,
+        `SELECT r.id, r.carrier_id, c.name AS carrier_name, r.product_line, r.basis,
+                r.first_term_pct, r.renewal_pct, r.agency_retains_renewal,
+                r.effective_from, r.effective_to
+         FROM commission_rules r
+         JOIN carriers c ON c.id = r.carrier_id
+         ORDER BY c.name, r.product_line NULLS FIRST`,
       );
       return { rules: rows };
     }),
@@ -38,18 +41,21 @@ export async function commissionRuleRoutes(app: FastifyInstance): Promise<void> 
             agency_retains_renewal, effective_from, effective_to)
          VALUES (app.current_agency(), $1,$2,$3,$4,$5,$6,$7,$8)
          RETURNING id`,
-        [
-          body.carrierId,
-          body.productLine ?? null,
-          body.basis,
-          body.firstTermPct ?? null,
-          body.renewalPct ?? null,
-          body.agencyRetainsRenewal,
-          body.effectiveFrom ?? null,
-          body.effectiveTo ?? null,
-        ],
+        [body.carrierId, body.productLine ?? null, body.basis,
+         body.firstTermPct ?? null, body.renewalPct ?? null,
+         body.agencyRetainsRenewal, body.effectiveFrom ?? null, body.effectiveTo ?? null],
       );
       return reply.code(201).send({ id: rows[0]!.id });
+    });
+  });
+
+  app.delete('/commission-rules/:id', { preHandler: requireRole('agency_admin') }, async (req, reply) => {
+    const params = parse(z.object({ id: z.string().uuid() }), req.params, reply);
+    if (!params) return;
+    return withTenant(tenantContext(req), async (c) => {
+      const { rowCount } = await c.query('DELETE FROM commission_rules WHERE id = $1', [params.id]);
+      if (!rowCount) return reply.code(404).send({ error: 'rule_not_found' });
+      return reply.code(204).send();
     });
   });
 }
