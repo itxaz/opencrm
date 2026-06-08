@@ -5,6 +5,7 @@ import AgentsModule from "./modules/AgentsModule.jsx";
 import CarriersModule from "./modules/CarriersModule.jsx";
 import CommissionRulesModule from "./modules/CommissionRulesModule.jsx";
 import PoliciesModule from "./modules/PoliciesModule.jsx";
+import UploadsModule from "./modules/UploadsModule.jsx";
 
 // ============================================================
 // LEGACY CLIENT STORE (ClientsModule still uses localStorage)
@@ -135,6 +136,7 @@ const LoginScreen = ({ onLogin }) => {
 // ============================================================
 const AVAILABLE_MODULES = [
   { id: "commissions", label: "Commission Hub", color: "#f7c94f" },
+  { id: "uploads", label: "Statement Upload", color: "#34d399" },
   { id: "agents", label: "Agents", color: "#3ecf8e" },
   { id: "carriers", label: "Carriers", color: "#f7934f" },
   { id: "rules", label: "Commission Rules", color: "#4f8ef7" },
@@ -703,6 +705,7 @@ const useStore = () => {
 const Sidebar = ({ active, setActive, collapsed, setCollapsed, session, onLogout, allowedModules }) => {
   const allModules = [
     { id: "commissions", label: "Commission Hub", icon: "accounting", color: "#f7c94f" },
+    { id: "uploads", label: "Statement Upload", icon: "documents", color: "#34d399" },
     { id: "agents", label: "Agents", icon: "crm", color: "#3ecf8e" },
     { id: "carriers", label: "Carriers", icon: "database", color: "#f7934f" },
     { id: "rules", label: "Commission Rules", icon: "accounting", color: "#4f8ef7" },
@@ -1811,6 +1814,7 @@ export default function App() {
 
   const allModuleMap = {
     commissions: <CommissionHub session={session}/>,
+    uploads: <UploadsModule/>,
     agents: <AgentsModule/>,
     carriers: <CarriersModule session={session}/>,
     rules: <CommissionRulesModule/>,

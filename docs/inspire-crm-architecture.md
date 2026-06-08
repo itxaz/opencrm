@@ -616,6 +616,19 @@ sequenceDiagram
     DB-->>Staff: review queue / imported
 ```
 
+> **Implementation status (current):** Phase-1 CSV ingest is built end-to-end as a
+> *synchronous* path — `POST /imports/preview` parses + maps + scores confidence with no
+> writes (powering the in-app mapping review wizard), and `POST /imports` persists
+> `uploads → carrier_statements → import_batches → statement_line_items`, auto-matches each
+> line to a policy by `policy_number`, and (when `autoReconcile`) runs the Phase-2
+> `reconcile()` against the open `commission_ledger` row, raising `reconciliation_exceptions`
+> (`underpaid` / `overpaid` / `rate_mismatch` / `unmatched` / `missing`). The CSV parser and
+> column-mapping logic live as pure, unit-tested functions in `server/src/domain/parse.ts`,
+> so they lift cleanly into a BullMQ parse worker (with S3 raw-file storage and the Claude
+> PDF fallback) when async ingest and larger files are needed. Raw bytes are currently kept
+> inline (`storage_key = inline:<filename>`) pending object storage. XLSX import is a planned
+> follow-up.
+
 ### Phase 2 — Reconcile
 
 ```mermaid

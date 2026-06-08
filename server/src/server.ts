@@ -9,6 +9,8 @@ import { carrierRoutes } from './routes/carriers.js';
 import { commissionRuleRoutes } from './routes/commissionRules.js';
 import { policyRoutes } from './routes/policies.js';
 import { uploadRoutes } from './routes/uploads.js';
+import { mappingProfileRoutes } from './routes/mappingProfiles.js';
+import { importRoutes } from './routes/imports.js';
 import { ledgerRoutes } from './routes/ledger.js';
 
 export function buildApp() {
@@ -28,6 +30,8 @@ export function buildApp() {
   app.register(commissionRuleRoutes);
   app.register(policyRoutes);
   app.register(uploadRoutes);
+  app.register(mappingProfileRoutes);
+  app.register(importRoutes);
   app.register(ledgerRoutes);
 
   return app;
