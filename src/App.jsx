@@ -63,13 +63,13 @@ const LoginScreen = ({ onLogin }) => {
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Syne:wght@400;600;700;800&display=swap');
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         :root {
-          --bg: #0a0c10; --surface: #111318; --surface2: #181c24; --surface3: #1e2330;
-          --border: #ffffff0f; --border2: #ffffff18; --accent: #4f8ef7; --accent2: #7c6af7;
-          --green: #3ecf8e; --red: #f76f6f; --yellow: #f7c94f; --text: #e8eaf2;
-          --text2: #8a90a8; --text3: #545970; --font-display: 'Syne', sans-serif; --font-body: 'DM Sans', sans-serif;
+          --bg: #f5f7fa; --surface: #ffffff; --surface2: #f0f2f5; --surface3: #e8ebf0;
+          --border: #0000000a; --border2: #00000012; --accent: #4f8ef7; --accent2: #7c6af7;
+          --green: #16a34a; --red: #dc2626; --yellow: #ca8a04; --text: #1a1d26;
+          --text2: #4b5068; --text3: #8a90a8; --font-display: 'Syne', sans-serif; --font-body: 'DM Sans', sans-serif;
         }
         body { background: var(--bg); color: var(--text); font-family: var(--font-body); }
-        input { background: var(--surface3); border: 1px solid var(--border2); border-radius: 10px; color: var(--text); font-family: var(--font-body); font-size: 14px; padding: 10px 14px; outline: none; transition: border-color .2s; width: 100%; }
+        input { background: var(--surface); border: 1px solid #d1d5db; border-radius: 10px; color: var(--text); font-family: var(--font-body); font-size: 14px; padding: 10px 14px; outline: none; transition: border-color .2s; width: 100%; }
         input:focus { border-color: var(--accent); }
         button { cursor: pointer; font-family: var(--font-body); font-size: 14px; border: none; border-radius: 10px; transition: all .15s; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
@@ -77,7 +77,7 @@ const LoginScreen = ({ onLogin }) => {
       `}</style>
 
       {/* Background glow */}
-      <div style={{ position: "fixed", top: "30%", left: "50%", transform: "translate(-50%,-50%)", width: 600, height: 600, background: "radial-gradient(circle, #4f8ef722 0%, transparent 70%)", pointerEvents: "none" }}/>
+      <div style={{ position: "fixed", top: "30%", left: "50%", transform: "translate(-50%,-50%)", width: 600, height: 600, background: "radial-gradient(circle, #4f8ef715 0%, transparent 70%)", pointerEvents: "none" }}/>
 
       <div style={{ width: 400, animation: "fadeIn .4s ease" }}>
         {/* Logo */}
@@ -92,7 +92,7 @@ const LoginScreen = ({ onLogin }) => {
         </div>
 
         {/* Card */}
-        <div style={{ background: "var(--surface)", border: "1px solid var(--border2)", borderRadius: 20, padding: 32, boxShadow: "0 24px 64px #0008" }}>
+        <div style={{ background: "var(--surface)", border: "1px solid #d1d5db", borderRadius: 20, padding: 32, boxShadow: "0 24px 64px #0001" }}>
           <form onSubmit={handleLogin}>
             <div style={{ marginBottom: 16 }}>
               <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "var(--text2)", marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.5px" }}>Email</label>
@@ -398,34 +398,34 @@ const GlobalStyle = () => (
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg: #0a0c10;
-      --surface: #111318;
-      --surface2: #181c24;
-      --surface3: #1e2330;
-      --border: #ffffff0f;
-      --border2: #ffffff18;
+      --bg: #f5f7fa;
+      --surface: #ffffff;
+      --surface2: #f0f2f5;
+      --surface3: #e8ebf0;
+      --border: #0000000a;
+      --border2: #00000012;
       --accent: #4f8ef7;
       --accent2: #7c6af7;
       --accent3: #f7934f;
-      --green: #3ecf8e;
-      --red: #f76f6f;
-      --yellow: #f7c94f;
-      --text: #e8eaf2;
-      --text2: #8a90a8;
-      --text3: #545970;
+      --green: #16a34a;
+      --red: #dc2626;
+      --yellow: #ca8a04;
+      --text: #1a1d26;
+      --text2: #4b5068;
+      --text3: #8a90a8;
       --font-display: 'Syne', sans-serif;
       --font-body: 'DM Sans', sans-serif;
       --radius: 10px;
       --radius2: 16px;
-      --shadow: 0 4px 24px #0008;
-      --glow: 0 0 40px #4f8ef722;
+      --shadow: 0 4px 24px #0001;
+      --glow: 0 0 40px #4f8ef715;
     }
 
     body { background: var(--bg); color: var(--text); font-family: var(--font-body); overflow: hidden; }
 
     ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb { background: #c1c5cd; border-radius: 3px; }
 
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes slideIn { from { opacity: 0; transform: translateX(-16px); } to { opacity: 1; transform: translateX(0); } }
