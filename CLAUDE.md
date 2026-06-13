@@ -140,3 +140,20 @@ Key env var on web: `VITE_API_URL` (build-time, must include `https://`)
 ## Styling
 
 Light theme. CSS variables defined in two places in `src/App.jsx` (login screen + main app shell). Fonts: Syne (display), DM Sans (body). Accent: `#4f8ef7` blue.
+
+## Valuation notes (rough, as of 2026-06)
+
+> Not financial advice — a real valuation comes from a buyer reviewing actual books (ARR, contracts, margins). Estimates below assume an as-is sale.
+
+**Two things could be sold:**
+1. **The codebase as an IP asset** — modern multi-tenant vertical-SaaS MVP (Postgres + RLS, JWT auth, commission-reconciliation engine, CSV ingest with AI fallback, agent statements, premium reserves/factoring). Roughly 4–8 months of solid engineering. As pure IP with no revenue attached: **~$30K–$150K** (cost-to-replicate minus integration/maintenance risk). Lower end given it's early, single migration, no E2E tests, Phase 5 scoped-but-unbuilt.
+2. **The business** — sells on a multiple of recurring revenue. Early, two-customer, founder-dependent B2B SaaS typically trades at **2–5× ARR**.
+
+**Key distinction:** the "~$5M and ~$50M revenue" figures are the *agencies' (customers')* sizes, NOT Inspire CRM's revenue. The valuation driver is what those two clients actually *pay Inspire*, under what contract.
+
+**Ballpark by ARR (what Inspire bills the two clients combined):**
+- $0 (unpaid pilots) → falls back to the code-asset number (**~$30K–$150K**)
+- ~$60K/yr → **~$120K–$300K**
+- ~$200K/yr → **~$400K–$1M**
+
+**Biggest value levers:** (1) convert the two clients to signed, paying, multi-year contracts; (2) reduce key-person dependency (docs, tests, a second person who knows the system); (3) reduce customer concentration (two customers = high risk — losing one loses ~half the business). Commission systems are sticky once they're the source of truth, which supports retention.
