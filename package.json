@@ -1,8 +1,8 @@
 {
-  "name": "opencrm",
+  "name": "inspire-ops",
   "private": true,
   "version": "1.0.0",
-  "description": "OpenCRM - Full-featured open source CRM built with React",
+  "description": "Inspire Operations Platform — commission reconciliation and operations for transit insurance agencies",
   "type": "module",
   "scripts": {
     "dev": "vite",

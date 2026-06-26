@@ -1,6 +1,6 @@
-# Netlify deployment for the Inspire CRM frontend (Vite/React SPA).
+# Netlify deployment for the Inspire OPs frontend (Vite/React SPA).
 # The backend API is NOT hosted here — it runs as a long-lived container
-# (Railway/Render/Fly) with managed Postgres + Redis. See docs/inspire-crm-architecture.md.
+# (Railway/Render/Fly) with managed Postgres + Redis. See docs/inspire-ops-architecture.md.
 
 [build]
   command = "npm run build"

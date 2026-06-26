@@ -1,4 +1,4 @@
-# Deploying Inspire CRM on Railway (single platform)
+# Deploying Inspire OPs on Railway (single platform)
 
 > **Run it locally first.** Before deploying, smoke-test the whole stack with Docker Compose:
 >
@@ -20,7 +20,7 @@ One Railway **project** hosts all four pieces — the API container, the static 
 Services reference each other's variables, so connection strings resolve automatically.
 
 ```
-Railway project: inspire-crm
+Railway project: Inspire Operations Platform
 ├── Postgres        (managed)         → provides DATABASE_URL
 ├── Redis           (managed)         → provides REDIS_URL
 ├── api   service   (Dockerfile: server/Dockerfile, root dir: server)
@@ -86,5 +86,5 @@ Logins: `itx@inspirecrm.test`, `admin@demo.test`, `jane@demo.test` — all `pass
 - **API** is stateless — raise its replica count; Railway load-balances. Run **workers** (BullMQ,
   Phase 1/5) as additional services off the same image with a worker start command.
 - **Postgres**: enable backups; add PgBouncer (or Railway's pooling) and read replicas as tenant
-  volume grows toward national scale (see the [architecture blueprint](inspire-crm-architecture.md) §9).
+  volume grows toward national scale (see the [architecture blueprint](inspire-ops-architecture.md) §9).
 - Same code runs unchanged on Render/Fly/AWS — only the dashboard wiring differs.

@@ -1,4 +1,4 @@
-// Thin client for the Inspire CRM API. Base URL comes from VITE_API_URL at build time
+// Thin client for the Inspire OPs API. Base URL comes from VITE_API_URL at build time
 // (set per Railway service); falls back to same-origin "/api" when proxied.
 const BASE = (import.meta.env.VITE_API_URL ?? '/api').replace(/\/$/, '');
 

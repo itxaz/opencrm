@@ -1,4 +1,4 @@
-# Inspire CRM — Technical Architecture Blueprint
+# Inspire OPs — Technical Architecture Blueprint
 
 > ITX's branded commission-reconciliation platform for transit insurance agencies.
 > Status: design blueprint. Backend = custom Node + Postgres. Tenancy = shared DB with
@@ -8,7 +8,7 @@
 
 ## 1. Vision & Problem
 
-**Inspire CRM** is ITX's branded SaaS for **transit insurance agencies** — from small/mid-market
+**Inspire OPs** is ITX's branded SaaS for **transit insurance agencies** — from small/mid-market
 firms up to nationals. Two clients are already live on the predecessor platform ("Ana"), generating
 roughly **$5M** and **$50M** in revenue respectively.
 

@@ -87,7 +87,7 @@ const LoginScreen = ({ onLogin }) => {
               <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
             </svg>
           </div>
-          <div style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 26, color: "var(--text)", letterSpacing: "-0.5px" }}>OpenCRM</div>
+          <div style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 26, color: "var(--text)", letterSpacing: "-0.5px" }}>Inspire OPs</div>
           <div style={{ color: "var(--text3)", fontSize: 13, marginTop: 4 }}>Sign in to your account</div>
         </div>
 
@@ -204,7 +204,7 @@ const ClientsModule = () => {
   };
 
   const copyCredentials = (client) => {
-    const text = `OpenCRM Login\nURL: ${window.location.href}\nUsername: ${client.username}\nPassword: ${client.password}`;
+    const text = `Inspire OPs Login\nURL: ${window.location.href}\nUsername: ${client.username}\nPassword: ${client.password}`;
     navigator.clipboard.writeText(text).then(() => { setCopied(client.id); setTimeout(() => setCopied(null), 2000); });
   };
 
@@ -753,7 +753,7 @@ const Sidebar = ({ active, setActive, collapsed, setCollapsed, session, onLogout
         <div style={{ width: 32, height: 32, background: "linear-gradient(135deg, var(--accent), var(--accent2))", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
           <Icon name="zap" size={16} color="#fff"/>
         </div>
-        {!collapsed && <span style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 17, color: "var(--text)", whiteSpace: "nowrap" }}>OpenCRM</span>}
+        {!collapsed && <span style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 17, color: "var(--text)", whiteSpace: "nowrap" }}>Inspire OPs</span>}
       </div>
 
       {/* Client badge */}

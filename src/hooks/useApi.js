@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { api } from '../lib/api.js';
 
 /**
- * Fetches `path` from the Inspire CRM API on mount and whenever `deps` change.
+ * Fetches `path` from the Inspire OPs API on mount and whenever `deps` change.
  * Returns { data, loading, error, refetch }.
  */
 export function useApi(path, deps = []) {

@@ -1,7 +1,7 @@
-# Inspire CRM — Backend API
+# Inspire OPs — Backend API
 
 Node + TypeScript (Fastify) API over PostgreSQL for the transit-insurance commission platform.
-Implements the foundation of the [architecture blueprint](../docs/inspire-crm-architecture.md):
+Implements the foundation of the [architecture blueprint](../docs/inspire-ops-architecture.md):
 multi-tenant data model with **Row-Level Security**, JWT auth + RBAC, and the Phase 1–2 commission
 workflow (carrier uploads → expected-vs-paid ledger → reconciliation exceptions).
 

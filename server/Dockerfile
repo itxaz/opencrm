@@ -1,4 +1,4 @@
-# Inspire CRM API — container image for Railway (or any container host).
+# Inspire OPs API — container image for Railway (or any container host).
 FROM node:20-slim AS deps
 WORKDIR /app
 COPY package*.json ./

@@ -1,4 +1,4 @@
-# OpenCRM 🚀
+# Inspire Operations Platform
 
 A full-featured open-source CRM built with React. Includes 15 modules:
 **CRM · Sales · Invoicing · Inventory · Email Marketing · Documents · Database · Accounting · Project · Sign · Knowledge Base · eLearning · Social Marketing · WhatsApp Messaging · Dashboard**
@@ -27,7 +27,7 @@ unchanged on Render / Fly.io / AWS.
 
 > **Frontend-only alternative:** the SPA can also deploy to **Netlify** (or Vercel) on its own via
 > the included `netlify.toml` (SPA fallback + asset caching); point it at the API with `VITE_API_URL`.
-> See [`docs/inspire-crm-architecture.md`](docs/inspire-crm-architecture.md) for the deployment
+> See [`docs/inspire-ops-architecture.md`](docs/inspire-ops-architecture.md) for the deployment
 > topology and rationale.
 
 ---
@@ -35,10 +35,10 @@ unchanged on Render / Fly.io / AWS.
 ## 🐙 Push to GitHub
 
 ```bash
-# Inside the opencrm folder:
+# Inside the inspire-ops folder:
 git init
 git add .
-git commit -m "Initial commit: OpenCRM"
+git commit -m "Initial commit: Inspire OPs"
 
 # Create a new repo on github.com, then:
 git remote add origin https://github.com/YOUR_USERNAME/opencrm.git
@@ -68,7 +68,7 @@ npm run build
 ## 🗂️ Project Structure
 
 ```
-opencrm/
+inspire-ops/
 ├── public/
 │   └── favicon.svg
 ├── src/
@@ -84,7 +84,7 @@ opencrm/
 
 ## 🏛️ Architecture
 
-See **[`docs/inspire-crm-architecture.md`](docs/inspire-crm-architecture.md)** for the Inspire CRM
+See **[`docs/inspire-ops-architecture.md`](docs/inspire-ops-architecture.md)** for the Inspire OPs
 technical blueprint — database schema, five-phase roadmap with base/premium tiers, data-flow
 diagrams, and the scalability plan (custom Node + Postgres, shared DB with row-level security).
 

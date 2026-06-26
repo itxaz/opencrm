@@ -1,4 +1,4 @@
-# Inspire CRM frontend — static SPA served by Caddy. For Railway "web" service.
+# Inspire OPs frontend — static SPA served by Caddy. For Railway "web" service.
 FROM node:20-slim AS build
 WORKDIR /app
 COPY package*.json ./

@@ -47,7 +47,7 @@ if (isMain) {
   const app = buildApp();
   app
     .listen({ port: config.port, host: config.host })
-    .then(() => app.log.info(`Inspire CRM API listening on ${config.host}:${config.port}`))
+    .then(() => app.log.info(`Inspire OPs API listening on ${config.host}:${config.port}`))
     .catch((err) => {
       app.log.error(err);
       process.exit(1);

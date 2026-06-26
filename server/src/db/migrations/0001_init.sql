@@ -1,4 +1,4 @@
--- Inspire CRM — initial schema (Phases 1–4 tables) with multi-tenant Row-Level Security.
+-- Inspire OPs — initial schema (Phases 1–4 tables) with multi-tenant Row-Level Security.
 -- Applied by the table-owner role; the runtime role (inspire_app) is subject to the policies below.
 
 CREATE EXTENSION IF NOT EXISTS citext;

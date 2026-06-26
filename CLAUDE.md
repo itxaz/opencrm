@@ -1,6 +1,6 @@
-# Inspire CRM
+# Inspire Operations Platform (Inspire OPs)
 
-ITX's branded SaaS for transit insurance agencies. Solves the commission-float problem: agencies front commissions to agents for ~30 days then wait ~15 more for carrier settlement. Agents get no statements, breeding mistrust. This system provides real-time owed-vs-paid visibility and automated agent commission statements.
+ITX's branded SaaS (Inspire OPs) for transit insurance agencies. Solves the commission-float problem: agencies front commissions to agents for ~30 days then wait ~15 more for carrier settlement. Agents get no statements, breeding mistrust. This system provides real-time owed-vs-paid visibility and automated agent commission statements.
 
 Two clients are live (~$5M and ~$50M revenue).
 
@@ -149,7 +149,7 @@ Light theme. CSS variables defined in two places in `src/App.jsx` (login screen 
 1. **The codebase as an IP asset** — modern multi-tenant vertical-SaaS MVP (Postgres + RLS, JWT auth, commission-reconciliation engine, CSV ingest with AI fallback, agent statements, premium reserves/factoring). Roughly 4–8 months of solid engineering. As pure IP with no revenue attached: **~$30K–$150K** (cost-to-replicate minus integration/maintenance risk). Lower end given it's early, single migration, no E2E tests, Phase 5 scoped-but-unbuilt.
 2. **The business** — sells on a multiple of recurring revenue. Early, two-customer, founder-dependent B2B SaaS typically trades at **2–5× ARR**.
 
-**Key distinction:** the "~$5M and ~$50M revenue" figures are the *agencies' (customers')* sizes, NOT Inspire CRM's revenue. The valuation driver is what those two clients actually *pay Inspire*, under what contract.
+**Key distinction:** the "~$5M and ~$50M revenue" figures are the *agencies' (customers')* sizes, NOT Inspire OPs' revenue. The valuation driver is what those two clients actually *pay Inspire*, under what contract.
 
 **Ballpark by ARR (what Inspire bills the two clients combined):**
 - $0 (unpaid pilots) → falls back to the code-asset number (**~$30K–$150K**)
@@ -160,4 +160,4 @@ Light theme. CSS variables defined in two places in `src/App.jsx` (login screen 
 
 ## Competitive positioning
 
-See `docs/competitive-analysis.md` for the full breakdown. Summary: Inspire CRM is a **back-office, vertical** product (commission reconciliation + agent transparency for transit insurance). Most insurtech tools we get compared to — e.g. **Gail (meetgail.com)**, an AI front-office assistant that handles calls/quoting/service — solve a *different* problem and are **complementary, not direct competitors**. Moat = depth in the commission/transit niche.
+See `docs/competitive-analysis.md` for the full breakdown. Summary: Inspire OPs is a **back-office, vertical** product (commission reconciliation + agent transparency for transit insurance). Most insurtech tools we get compared to — e.g. **Gail (meetgail.com)**, an AI front-office assistant that handles calls/quoting/service — solve a *different* problem and are **complementary, not direct competitors**. Moat = depth in the commission/transit niche.

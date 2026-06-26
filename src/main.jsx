@@ -7,7 +7,7 @@ import * as inspireApi from './lib/api.js'
 // UI modules migrate off localStorage onto this client in the API-integration slice.
 if (typeof window !== 'undefined') {
   window.inspireApi = inspireApi
-  console.info('[Inspire CRM] API base:', import.meta.env.VITE_API_URL ?? '/api')
+  console.info('[Inspire OPs] API base:', import.meta.env.VITE_API_URL ?? '/api')
 }
 
 ReactDOM.createRoot(document.getElementById('root')).render(

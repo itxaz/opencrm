@@ -5,7 +5,7 @@
 
 ## Positioning summary
 
-Inspire CRM is a **back-office, vertical** product: commission reconciliation and
+Inspire OPs is a **back-office, vertical** product: commission reconciliation and
 agent-payment transparency for **transit insurance agencies**. It is not a horizontal
 CRM or a front-office sales/quoting tool. Most "insurtech" products we'll be compared
 to actually solve a *different* problem and are complementary rather than head-to-head.
@@ -20,9 +20,9 @@ to actually solve a *different* problem and are complementary rather than head-t
 - **Scope:** Broad, horizontal, customer-facing (revenue generation + service).
 - **Maturity:** Funded, marketed, multi-agency, active paid go-to-market.
 
-### Inspire CRM vs. Gail
+### Inspire OPs vs. Gail
 
-| Dimension | Inspire CRM | Gail |
+| Dimension | Inspire OPs | Gail |
 |---|---|---|
 | Part of agency | Back office (commissions, payouts) | Front office (calls, quoting, service) |
 | Problem | Commission-float, agent mistrust, owed-vs-paid visibility | Customer service + sales automation |
