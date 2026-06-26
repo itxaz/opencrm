@@ -162,14 +162,71 @@ Light theme. CSS variables defined in two places in `src/App.jsx` (login screen 
 
 The file `docs/architecture.drawio` is the platform's living architecture diagram, shared between Santiago and Josue. **Every code change that affects architecture, infrastructure, API surface, database schema, or module structure MUST include an update to the draw.io diagram before the work is considered complete.**
 
-After making code changes:
-1. Open `docs/architecture.drawio` and update the affected page(s)
-2. Add a row to the **version tracking table** on Page 0 (Build, Date, Author, What Changed)
-3. Commit the updated `.drawio` file in the same commit or PR as the code change
+### What triggers a diagram update
 
-Pages: 0 (System Overview + version log), 1 (Layer 1: Data & Tenancy), 2 (Layer 2: Front Office), 3 (Layer 3: Insurance Vertical), 4 (Deploy & Infrastructure).
+Any change that touches: database schema (new tables, columns, RLS policies), API routes (new/modified endpoints), new modules or UI pages, infrastructure (Railway services, env vars, deploy config), auth/RBAC changes, or new integrations. Bug fixes and cosmetic UI changes do NOT require a diagram update.
 
-This produces a git-versioned change trail of every architectural decision — a prerequisite for SOC 2 Type II evidence (change management, asset inventory, and risk assessment controls).
+### How Claude updates the diagram
+
+The `docs/architecture.drawio` file is plain XML using the mxGraph format. Claude edits it directly — no GUI needed.
+
+**Step-by-step for Claude (both Santiago's and Josue's instances):**
+
+1. **Read** `docs/architecture.drawio` to get the current XML
+2. **Identify which page(s)** to update based on the code change:
+   - Page 0 (`id="overview"`, name="0 — System Overview") — layer boxes + version table
+   - Page 1 (`id="layer1"`, name="1 — Layer 1: Data & Tenancy") — Postgres, RLS, RBAC, JWT
+   - Page 2 (`id="layer2"`, name="2 — Layer 2: Front Office") — contacts, appointments, call log, etc.
+   - Page 3 (`id="layer3"`, name="3 — Layer 3: Insurance Vertical") — commission, CSV, statements
+   - Page 4 (`id="infra"`, name="4 — Deploy & Infrastructure") — Railway, env vars, deploy flow
+3. **Edit the XML** — add/modify `<mxCell>` elements inside the relevant `<diagram>` block. Match the existing style patterns (colors, fonts, rounded corners). New components use the layer's color scheme:
+   - Layer 3 (green): `fillColor=#3a9956;fontColor=#FFFFFF;strokeColor=#2D7D46`
+   - Layer 2 (amber): `fillColor=#FFF;fontColor=#7a5800;strokeColor=#F0A30A;dashed=1`
+   - Layer 1 (blue): `fillColor=#2a4d7a;fontColor=#FFFFFF;strokeColor=#1E3A5F`
+   - Infrastructure (gray): `fillColor=#666666;fontColor=#FFFFFF;strokeColor=#4A4A4A`
+4. **Add a version row** to the HTML table in the version tracking cell on Page 0 (the `<mxCell>` containing the `<table>` with Build/Date/Author/What Changed columns). Insert a new `<tr>` with the build version, today's date, author name (Santiago or Josue), and a brief description of what changed.
+5. **Commit** the updated `docs/architecture.drawio` in the same commit or PR as the code change. Never commit code changes that require a diagram update without including the diagram.
+
+### Version tracking table format
+
+On Page 0, the version tracking table is an HTML table inside an mxCell. Each row:
+```
+<tr>
+  <td style="padding:6px 12px;border:1px solid #ccc;">v1.1.0</td>
+  <td style="padding:6px 12px;border:1px solid #ccc;">2026-06-25</td>
+  <td style="padding:6px 12px;border:1px solid #ccc;">Josue</td>
+  <td style="padding:6px 12px;border:1px solid #ccc;">Added Layer 2 contacts endpoint</td>
+</tr>
+```
+
+### For Josue — setting up Claude on your side
+
+Add this to your project's `CLAUDE.md` or equivalent instructions file:
+
+```
+## Architecture diagram versioning
+
+This repo uses docs/architecture.drawio as the single source of truth for
+platform architecture. The file is plain XML (mxGraph format) committed to git.
+
+After any code change that affects architecture, API surface, database schema,
+infrastructure, or module structure:
+1. Read docs/architecture.drawio
+2. Edit the relevant page's XML to reflect the change
+3. Add a version row to the Page 0 tracking table
+4. Commit the .drawio update alongside the code change
+
+See the "Architecture diagram — mandatory version tracking" section in CLAUDE.md
+for the full style guide (colors, cell IDs, table format).
+```
+
+### SOC 2 relevance
+
+This workflow produces auditable evidence for:
+- **CC8.1 (Change Management)** — every architectural change is logged with author, date, and description in both the version table and git history
+- **CC3.1 (Risk Assessment)** — the diagram serves as a living asset inventory showing all components, data flows, and trust boundaries
+- **CC6.1 (Logical Access)** — the RBAC and auth pages document access control architecture
+- Git blame on the `.drawio` file shows exactly who changed what and when — auditors can trace any architectural decision to a specific commit
 
 ## Competitive positioning
 
