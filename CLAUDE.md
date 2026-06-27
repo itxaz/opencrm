@@ -44,7 +44,7 @@ server/src/auth/        JWT + password (argon2) + tenant context
 server/src/domain/      Pure business logic (commission math, CSV parsing, reconciliation, statements)
 server/src/routes/      REST route handlers
 server/src/db/          Migrations + seed
-docs/                   Architecture docs, deploy guide, Phase 5 scope
+docs/                   Architecture docs, deploy guide, emergency runbook, Phase 5 scope
 ```
 
 ## API routes
